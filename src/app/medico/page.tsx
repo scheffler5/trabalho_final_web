@@ -2,18 +2,19 @@
 
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { MOCK_APPOINTMENTS } from "@/lib/data";
 import type { DoctorUser } from "@/lib/auth";
 import {
-  CheckCircle2, Clock, Users,
-  Stethoscope, LogOut, Award, Phone,
+  getDoctorAppointments, isUpcoming, type Appointment,
+} from "@/lib/appointments";
+import {
+  CheckCircle2, Clock, Users, Stethoscope, LogOut, Award, Phone,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -21,11 +22,16 @@ import { ptBR } from "date-fns/locale";
 export default function MedicoDashboardPage() {
   const { user, logout } = useAuth();
   const doc = user as DoctorUser;
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  // Filtra consultas "do médico" (simulação — usa os mocks globais)
-  const upcoming  = MOCK_APPOINTMENTS.filter(a => a.status === "scheduled");
-  const completed = MOCK_APPOINTMENTS.filter(a => a.status === "completed");
+  useEffect(() => {
+    if (user) setAppointments(getDoctorAppointments(user.id));
+  }, [user]);
+
+  const upcoming  = appointments.filter(isUpcoming);
+  const completed = appointments.filter((a) => a.status === "completed");
   const next      = upcoming[0];
+  const uniquePatients = new Set(appointments.map((a) => a.patientId)).size;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -50,10 +56,10 @@ export default function MedicoDashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Próximas",  value: upcoming.length,  icon: Clock,        color: "text-blue-500" },
-          { label: "Realizadas",value: completed.length, icon: CheckCircle2, color: "text-green-500" },
-          { label: "Pacientes", value: 12, icon: Users, color: "text-purple-500" },
-          { label: "Avaliação", value: "4.9⭐", icon: Award, color: "text-yellow-500" },
+          { label: "Próximas",   value: upcoming.length,  icon: Clock,        color: "text-blue-500"   },
+          { label: "Realizadas", value: completed.length, icon: CheckCircle2, color: "text-green-500"  },
+          { label: "Pacientes",  value: uniquePatients,   icon: Users,        color: "text-purple-500" },
+          { label: "Total",      value: appointments.length, icon: Award,     color: "text-yellow-500" },
         ].map(s => (
           <Card key={s.label}>
             <CardContent className="p-4 flex items-center gap-3">
@@ -78,11 +84,14 @@ export default function MedicoDashboardPage() {
           <CardContent>
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <p className="font-semibold">{next.doctorName}</p>
+                <p className="font-semibold">{next.patientName}</p>
                 <p className="text-sm text-muted-foreground">{next.specialty}</p>
                 <p className="text-sm font-medium">
                   {format(new Date(next.date + "T12:00:00"), "dd 'de' MMMM", { locale: ptBR })} às {next.time}
                 </p>
+                {next.notes && (
+                  <p className="text-xs text-muted-foreground mt-1">Obs: {next.notes}</p>
+                )}
               </div>
               <Badge className="bg-blue-100 text-blue-700 border-0">Agendada</Badge>
             </div>
@@ -108,11 +117,11 @@ export default function MedicoDashboardPage() {
                         <Clock className="h-4 w-4 text-blue-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">Paciente — {a.doctorName.split(" ")[1]}</p>
-                        <p className="text-xs text-muted-foreground">{a.specialty}</p>
-                        <p className="text-xs font-medium">
+                        <p className="font-semibold text-sm truncate">{a.patientName}</p>
+                        <p className="text-xs text-muted-foreground">
                           {format(new Date(a.date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} às {a.time}
                         </p>
+                        {a.notes && <p className="text-xs text-muted-foreground truncate">Obs: {a.notes}</p>}
                       </div>
                       <Badge className="bg-blue-100 text-blue-700 border-0 shrink-0">Agendada</Badge>
                     </CardContent>
@@ -133,9 +142,8 @@ export default function MedicoDashboardPage() {
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">Consulta realizada</p>
-                        <p className="text-xs text-muted-foreground">{a.specialty}</p>
-                        <p className="text-xs font-medium">
+                        <p className="font-semibold text-sm truncate">{a.patientName}</p>
+                        <p className="text-xs text-muted-foreground">
                           {format(new Date(a.date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} às {a.time}
                         </p>
                       </div>
@@ -143,12 +151,15 @@ export default function MedicoDashboardPage() {
                     </CardContent>
                   </Card>
                 ))}
+                {completed.length === 0 && (
+                  <p className="text-center py-8 text-muted-foreground">Nenhuma consulta realizada ainda.</p>
+                )}
               </div>
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Perfil profissional */}
+        {/* Perfil */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Meu Perfil</CardTitle>
@@ -190,7 +201,7 @@ export default function MedicoDashboardPage() {
             <Separator />
 
             <div className="bg-muted/50 rounded-md p-3 text-xs text-muted-foreground">
-              Integração com agenda e prontuários disponível após integração com o backend.
+              Integração com prontuários disponível após integração com o backend.
             </div>
           </CardContent>
         </Card>

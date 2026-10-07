@@ -2,22 +2,18 @@
 
 export const dynamic = "force-dynamic";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { MOCK_APPOINTMENTS } from "@/lib/data";
 import {
-  CalendarDays,
-  Brain,
-  Plus,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  LogOut,
-  User,
+  getPatientAppointments, isUpcoming, type Appointment,
+} from "@/lib/appointments";
+import {
+  CalendarDays, Brain, Plus, Clock, CheckCircle2, XCircle, LogOut, User,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -38,10 +34,14 @@ function statusIcon(status: string) {
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  const upcoming = MOCK_APPOINTMENTS.filter((a) => a.status === "scheduled");
-  const past = MOCK_APPOINTMENTS.filter((a) => a.status !== "scheduled");
+  useEffect(() => {
+    if (user) setAppointments(getPatientAppointments(user.id));
+  }, [user]);
 
+  const upcoming = appointments.filter(isUpcoming);
+  const past     = appointments.filter((a) => !isUpcoming(a));
   const nextAppt = upcoming[0];
 
   return (
@@ -62,13 +62,13 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Próximas", value: upcoming.length, icon: CalendarDays, color: "text-blue-500" },
-          { label: "Realizadas", value: past.filter(a => a.status === "completed").length, icon: CheckCircle2, color: "text-green-500" },
-          { label: "Total", value: MOCK_APPOINTMENTS.length, icon: Brain, color: "text-primary" },
-          { label: "Médicos", value: new Set(MOCK_APPOINTMENTS.map(a => a.doctorId)).size, icon: User, color: "text-orange-500" },
+          { label: "Próximas",   value: upcoming.length,                                      icon: CalendarDays,  color: "text-blue-500"   },
+          { label: "Realizadas", value: past.filter(a => a.status === "completed").length,    icon: CheckCircle2,  color: "text-green-500"  },
+          { label: "Total",      value: appointments.length,                                  icon: Brain,         color: "text-primary"    },
+          { label: "Médicos",    value: new Set(appointments.map(a => a.doctorId)).size,      icon: User,          color: "text-orange-500" },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="p-4 flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Next appointment highlight */}
+      {/* Próxima consulta em destaque */}
       {nextAppt && (
         <Card className="mb-8 border-primary/30 bg-primary/5">
           <CardHeader className="pb-2">
@@ -116,7 +116,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Actions */}
+      {/* Ações */}
       <div className="flex flex-wrap gap-3 mb-8">
         <Link href="/dashboard/agendar">
           <Button className="gap-2">
@@ -130,7 +130,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Appointments list */}
+      {/* Lista de consultas */}
       <Tabs defaultValue="upcoming">
         <TabsList className="mb-4">
           <TabsTrigger value="upcoming">Próximas ({upcoming.length})</TabsTrigger>
@@ -150,9 +150,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {upcoming.map((a) => (
-                <AppointmentCard key={a.id} appt={a} />
-              ))}
+              {upcoming.map((a) => <AppointmentCard key={a.id} appt={a} />)}
             </div>
           )}
         </TabsContent>
@@ -165,9 +163,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {past.map((a) => (
-                <AppointmentCard key={a.id} appt={a} />
-              ))}
+              {past.map((a) => <AppointmentCard key={a.id} appt={a} />)}
             </div>
           )}
         </TabsContent>
@@ -176,7 +172,7 @@ export default function DashboardPage() {
   );
 }
 
-function AppointmentCard({ appt }: { appt: (typeof MOCK_APPOINTMENTS)[number] }) {
+function AppointmentCard({ appt }: { appt: Appointment }) {
   return (
     <Card>
       <CardContent className="p-4">
@@ -194,9 +190,7 @@ function AppointmentCard({ appt }: { appt: (typeof MOCK_APPOINTMENTS)[number] })
           <div className="shrink-0">{statusBadge(appt.status)}</div>
         </div>
         {appt.notes && (
-          <p className="text-xs text-muted-foreground mt-2 pl-13 border-t pt-2">
-            {appt.notes}
-          </p>
+          <p className="text-xs text-muted-foreground mt-2 border-t pt-2">{appt.notes}</p>
         )}
       </CardContent>
     </Card>
