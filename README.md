@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MenteSã — Sistema de Agendamento Psiquiátrico
 
-## Getting Started
+Projeto frontend desenvolvido para a disciplina de Desenvolvimento Web. Sistema de agendamento para clínica psiquiátrica com área pública, autenticação, cadastro de usuários e painel administrativo.
 
-First, run the development server:
+## Tecnologias
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS v4**
+- **Shadcn UI** (componentes com Base UI)
+- **React Hook Form** + **Zod** (formulários e validação)
+- **date-fns** (formatação de datas)
+
+## Como rodar
+
+### Pré-requisitos
+
+- Node.js 20+ instalado
+- npm, yarn ou pnpm
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone <url-do-repo>
+cd Projeto_Front
+
+# Instale as dependências
+npm install
+```
+
+### Desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build de produção
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+### Lint
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estrutura de páginas
 
-## Deploy on Vercel
+| Rota | Tipo | Descrição |
+|------|------|-----------|
+| `/` | Pública | Homepage com apresentação da clínica |
+| `/medicos` | Pública | Lista de profissionais aprovados |
+| `/sobre` | Pública | Página institucional |
+| `/login` | Pública | Login com e-mail e senha |
+| `/cadastro` | Pública | Seleção do tipo de cadastro |
+| `/cadastro/paciente` | Pública | Formulário de registro para pacientes |
+| `/cadastro/profissional` | Pública | Formulário para médicos/profissionais |
+| `/admin/registro` | Pública | Cadastro de administrador (requer código secreto) |
+| `/dashboard` | **Privada — Paciente** | Área do paciente |
+| `/medico` | **Privada — Médico** | Painel do profissional |
+| `/admin` | **Privada — Admin** | Gerenciamento de usuários e aprovações |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Sistema de usuários
+
+Os dados ficam em `localStorage` (sem backend). Há usuários de demonstração pré-carregados:
+
+| E-mail | Senha | Perfil |
+|--------|-------|--------|
+| `paciente@email.com` | `123456` | Paciente (aprovado) |
+| `medico@email.com` | `123456` | Médico (aprovado) |
+| `admin@email.com` | `123456` | Administrador |
+| `pendente@email.com` | `123456` | Médico (pendente) |
+
+### Perfis e permissões
+
+- **Paciente** — acessa `/dashboard`
+- **Médico** — acessa `/medico`; cadastro passa por aprovação do admin
+- **Admin** — acessa `/admin`; cadastro exige o código `MENTESA2025`
+
+---
+
+## Proteção de rotas
+
+O arquivo `src/proxy.ts` intercepta todas as requisições. Se o usuário tentar acessar uma rota sem permissão, é redirecionado automaticamente para sua área correta. A sessão é mantida via cookie `clinica_auth`.
+
+---
+
+## Validações de formulário
+
+- **CPF**: formato `000.000.000-00`
+- **Registro profissional**: 4–8 dígitos (CRM, COREN, CRP, etc.)
+- **Senhas**: mínimo 6 caracteres, confirmação obrigatória
+- **Admin**: código de acesso validado via Zod
