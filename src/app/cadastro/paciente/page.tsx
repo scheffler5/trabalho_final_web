@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
@@ -15,9 +15,30 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { PatientUser } from "@/lib/auth";
 import { Eye, EyeOff, CheckCircle2, ArrowLeft, User } from "lucide-react";
 
+// ─── Máscaras ─────────────────────────────────────────────────────────────────
+
+function maskCPF(value: string): string {
+  const d = value.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`;
+}
+
+function maskPhone(value: string): string {
+  const d = value.replace(/\D/g, "").slice(0, 11);
+  if (d.length === 0) return "";
+  if (d.length <= 2) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`;
+}
+
+// ─── Schema ───────────────────────────────────────────────────────────────────
+
 const schema = z.object({
   name:            z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
-  email:           z.string().email("E-mail inválido"),
+  email:           z.string().email("Informe um e-mail válido"),
   phone:           z.string().min(10, "Telefone inválido").optional().or(z.literal("")),
   dateOfBirth:     z.string().min(1, "Informe sua data de nascimento"),
   cpf:             z
@@ -40,9 +61,12 @@ export default function CadastroPacientePage() {
   const [serverError, setServerError] = useState("");
 
   const {
-    register, handleSubmit,
+    register, handleSubmit, control,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    mode: "onBlur",
+  });
 
   async function onSubmit(data: FormData) {
     setServerError("");
@@ -52,7 +76,7 @@ export default function CadastroPacientePage() {
       email:       data.email,
       password:    data.password,
       role:        "patient",
-      status:      "approved",   // pacientes têm acesso imediato
+      status:      "approved",
       createdAt:   new Date().toISOString(),
       cpf:         data.cpf,
       dateOfBirth: data.dateOfBirth,
@@ -120,13 +144,35 @@ export default function CadastroPacientePage() {
               <Field label="Data de nascimento" error={errors.dateOfBirth?.message}>
                 <Input type="date" {...register("dateOfBirth")} />
               </Field>
+
+              {/* Telefone com máscara */}
               <Field label="Telefone" error={errors.phone?.message}>
-                <Input placeholder="(11) 99999-0000" {...register("phone")} />
+                <Controller control={control} name="phone"
+                  render={({ field }) => (
+                    <Input
+                      placeholder="(11) 99999-0000"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(maskPhone(e.target.value))}
+                      onBlur={field.onBlur}
+                      inputMode="numeric"
+                    />
+                  )} />
               </Field>
             </div>
 
+            {/* CPF com máscara */}
             <Field label="CPF" error={errors.cpf?.message}>
-              <Input placeholder="000.000.000-00" {...register("cpf")} />
+              <Controller control={control} name="cpf"
+                render={({ field }) => (
+                  <Input
+                    placeholder="000.000.000-00"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(maskCPF(e.target.value))}
+                    onBlur={field.onBlur}
+                    inputMode="numeric"
+                    maxLength={14}
+                  />
+                )} />
             </Field>
 
             <Field label="Senha" error={errors.password?.message}>

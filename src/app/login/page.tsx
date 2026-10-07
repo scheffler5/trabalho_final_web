@@ -33,7 +33,7 @@ function LoginForm() {
     useState<"invalid" | "pending" | "rejected" | null>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } =
-    useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
+    useForm<LoginFormData>({ resolver: zodResolver(loginSchema), mode: "onBlur" });
 
   async function onSubmit(data: LoginFormData) {
     setErrorType(null);

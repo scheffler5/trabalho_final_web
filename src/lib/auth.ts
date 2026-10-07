@@ -167,7 +167,7 @@ export function setUserInStorage(user: User): void {
   localStorage.setItem(AUTH_COOKIE_NAME, JSON.stringify(user));
   document.cookie = `${AUTH_COOKIE_NAME}=${encodeURIComponent(
     JSON.stringify({ id: user.id, role: user.role })
-  )}; path=/`;
+  )}; path=/; Max-Age=${60 * 60 * 24 * 7}`; // 7 dias
 }
 
 export function clearUserFromStorage(): void {
