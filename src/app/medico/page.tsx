@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { MOCK_APPOINTMENTS } from "@/lib/data";
 import type { DoctorUser } from "@/lib/auth";
 import {
-  CalendarDays, CheckCircle2, Clock, Users,
+  CheckCircle2, Clock, Users,
   Stethoscope, LogOut, Award, Phone,
 } from "lucide-react";
 import { format } from "date-fns";

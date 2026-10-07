@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { MOCK_APPOINTMENTS, DOCTORS } from "@/lib/data";
+import { MOCK_APPOINTMENTS } from "@/lib/data";
 import {
   CalendarDays,
   Brain,
