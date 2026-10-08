@@ -25,7 +25,7 @@ export interface DoctorUser {
   status: UserStatus;
   createdAt: string;
   profession: string;
-  council: string;      // CRM, COREN, CRP, CREFITO, CRO, CRN...
+  council: string;      // CRM ou CRP
   councilState: string; // SP, RJ, MG...
   councilNumber: string;
   specialty?: string;
@@ -57,13 +57,10 @@ export const UF_LIST = [
 ];
 
 export const PROFESSION_COUNCIL: Record<string, string> = {
-  "Médico":         "CRM",
-  "Enfermeiro":     "COREN",
-  "Psicólogo":      "CRP",
-  "Fisioterapeuta": "CREFITO",
-  "Dentista":       "CRO",
-  "Nutricionista":  "CRN",
-  "Farmacêutico":   "CRF",
+  "Médico":      "CRM",
+  "Psiquiatra":  "CRM",
+  "Psicólogo":   "CRP",
+  "Terapeuta":   "CRP",
 };
 
 // ─── Initial seed users ───────────────────────────────────────────────────────

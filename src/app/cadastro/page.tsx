@@ -73,7 +73,7 @@ export default function CadastroPage() {
                     <span className="text-yellow-500">⏳</span> Cadastro sujeito à aprovação
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span> Validação de CRM / COREN / CRP
+                    <span className="text-green-500">✓</span> Validação de CRM / CRP
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-green-500">✓</span> Gestão de agenda e pacientes

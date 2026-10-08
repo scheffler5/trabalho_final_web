@@ -130,7 +130,7 @@ export default function CadastroProfissionalPage() {
           </div>
           <CardTitle className="text-2xl">Cadastro de Profissional</CardTitle>
           <CardDescription>
-            Para médicos, enfermeiros, psicólogos e demais profissionais de saúde.
+            Para médicos, psiquiatras, psicólogos e terapeutas.
             O cadastro ficará pendente até aprovação pelo administrador.
           </CardDescription>
         </CardHeader>
@@ -169,7 +169,7 @@ export default function CadastroProfissionalPage() {
             <Field label="Profissão" error={errors.profession?.message}>
               <Controller control={control} name="profession"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
                     <SelectTrigger><SelectValue placeholder="Selecione a profissão" /></SelectTrigger>
                     <SelectContent>
                       {PROFESSIONS.map((p) => (
@@ -180,7 +180,7 @@ export default function CadastroProfissionalPage() {
                 )} />
             </Field>
 
-            {/* CRM / COREN / etc. */}
+            {/* CRM / CRP */}
             <div className="space-y-1.5">
               <Label>
                 Registro no {councilPrefix}
@@ -200,7 +200,7 @@ export default function CadastroProfissionalPage() {
                 <Field label="" error={errors.councilState?.message}>
                   <Controller control={control} name="councilState"
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
                         <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
                         <SelectContent>
                           {UF_LIST.map((uf) => (
