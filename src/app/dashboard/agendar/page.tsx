@@ -128,7 +128,7 @@ export default function AgendarPage() {
                 render={({ field }) => (
                   <div className="space-y-1.5">
                     <Label>Médico</Label>
-                    <Select value={field.value}
+                    <Select value={field.value ?? ""}
                       onValueChange={(val) => { field.onChange(val); onDoctorChange(val); }}>
                       <SelectTrigger aria-invalid={!!errors.doctorId}>
                         <SelectValue placeholder="Selecione um especialista" />
