@@ -6,6 +6,7 @@ const ADMIN_ROUTES = [
   /^\/users$/,
   /^\/users\/pending$/,
   /^\/users\/[^/]+\/status$/,
+  /^\/users\/[^/]+$/,      // DELETE /users/:id
   /^\/appointments$/,
 ];
 
