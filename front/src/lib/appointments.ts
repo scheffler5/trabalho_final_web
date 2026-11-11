@@ -22,8 +22,25 @@ export interface CreateAppointmentPayload {
   notes?: string;
 }
 
-export const getPatientAppointments = () =>
-  api<Appointment[]>("/appointments/me");
+export interface TimeSlot {
+  time: string;
+  available: boolean;
+}
+
+// Monta a query string só com os filtros preenchidos
+function toQuery(params: Record<string, string | undefined>) {
+  const qs = new URLSearchParams(
+    Object.entries(params).filter((e): e is [string, string] => !!e[1]),
+  ).toString();
+  return qs ? `?${qs}` : "";
+}
+
+export const getPatientAppointments = (status?: Appointment["status"]) =>
+  api<Appointment[]>(`/appointments/me${toQuery({ status })}`);
+
+// GET /appointments/slots?doctorId=...&date=YYYY-MM-DD
+export const getSlots = (doctorId: string, date: string) =>
+  api<TimeSlot[]>(`/appointments/slots${toQuery({ doctorId, date })}`);
 
 export const getDoctorAppointments = () =>
   api<Appointment[]>("/appointments/doctor");

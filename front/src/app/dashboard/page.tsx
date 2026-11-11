@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   useEffect(() => {
-    if (user) setAppointments(getPatientAppointments(user.id));
+    if (user) getPatientAppointments().then(setAppointments).catch(() => {});
   }, [user]);
 
   const upcoming = appointments.filter(isUpcoming);
@@ -97,7 +97,7 @@ export default function DashboardPage() {
                   <Brain className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold">{nextAppt.doctorName}</p>
+                  <p className="font-semibold">{nextAppt.doctor?.name}</p>
                   <p className="text-sm text-muted-foreground">{nextAppt.specialty}</p>
                   <p className="text-sm font-medium">
                     {format(new Date(nextAppt.date + "T12:00:00"), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}{" "}
@@ -181,7 +181,7 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
             {statusIcon(appt.status)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm truncate">{appt.doctorName}</p>
+            <p className="font-semibold text-sm truncate">{appt.doctor?.name}</p>
             <p className="text-xs text-muted-foreground">{appt.specialty}</p>
             <p className="text-xs text-muted-foreground">
               {format(new Date(appt.date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} às {appt.time}
