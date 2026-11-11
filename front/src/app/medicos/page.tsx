@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getAllUsers, type DoctorUser } from "@/lib/auth";
+import { api } from "@/lib/api";
+import { type DoctorUser } from "@/lib/auth";
 import {
   Brain, Star, CalendarDays, CheckCircle2, Stethoscope, Users,
 } from "lucide-react";
@@ -14,11 +15,7 @@ export default function MedicosPage() {
   const [doctors, setDoctors] = useState<DoctorUser[]>([]);
 
   useEffect(() => {
-    const all = getAllUsers();
-    const approved = all.filter(
-      (u): u is DoctorUser => u.role === "doctor" && u.status === "approved"
-    );
-    setDoctors(approved);
+    api<DoctorUser[]>("/users/doctors").then(setDoctors).catch(() => {});
   }, []);
 
   return (

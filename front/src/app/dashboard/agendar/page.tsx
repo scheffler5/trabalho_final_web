@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { useAuth } from "@/contexts/AuthContext";
-import { getAllUsers, type DoctorUser } from "@/lib/auth";
+import { api } from "@/lib/api";
+import { type DoctorUser } from "@/lib/auth";
 import { addAppointment } from "@/lib/appointments";
 import { TIME_SLOTS } from "@/lib/data";
 import { ptBR } from "date-fns/locale";
@@ -39,10 +40,7 @@ export default function AgendarPage() {
   const [success, setSuccess]               = useState(false);
 
   useEffect(() => {
-    const approved = getAllUsers().filter(
-      (u): u is DoctorUser => u.role === "doctor" && u.status === "approved"
-    );
-    setDoctors(approved);
+    api<DoctorUser[]>("/users/doctors").then(setDoctors).catch(() => {});
   }, []);
 
   const {
@@ -60,20 +58,16 @@ export default function AgendarPage() {
 
   async function onSubmit(data: ScheduleFormData) {
     if (!user) return;
-    addAppointment({
-      id:          `appt_${Date.now()}`,
-      patientId:   user.id,
-      patientName: user.name,
-      doctorId:    data.doctorId,
-      doctorName:  selectedDoctor?.name ?? "",
-      specialty:   selectedDoctor?.specialty || selectedDoctor?.profession || "",
-      date:        format(data.date, "yyyy-MM-dd"),
-      time:        data.time,
-      status:      "scheduled",
-      notes:       data.notes || undefined,
-      createdAt:   new Date().toISOString(),
-    });
-    setSuccess(true);
+    try {
+      await addAppointment({
+        doctorId:  data.doctorId,
+        specialty: selectedDoctor?.specialty || selectedDoctor?.profession || "",
+        date:      format(data.date, "yyyy-MM-dd"),
+        time:      data.time,
+        notes:     data.notes || undefined,
+      });
+      setSuccess(true);
+    } catch {}
   }
 
   if (success) {
