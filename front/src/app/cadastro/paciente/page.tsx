@@ -115,8 +115,8 @@ export default function CadastroPacientePage() {
 
       <Card>
         <CardHeader>
-          <div className="h-11 w-11 rounded-full bg-blue-100 flex items-center justify-center mb-3">
-            <User className="h-5 w-5 text-blue-600" />
+          <div className="h-11 w-11 rounded-full bg-teal-100 flex items-center justify-center mb-3">
+            <User className="h-5 w-5 text-teal-600" />
           </div>
           <CardTitle className="text-2xl">Cadastro de Paciente</CardTitle>
           <CardDescription>

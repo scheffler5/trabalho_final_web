@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,14 +12,23 @@ export default function CadastroPage() {
   return (
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl space-y-8">
-        <div className="text-center">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 mb-4">
-            <Brain className="h-7 w-7 text-primary" />
+        <div className="relative h-48 overflow-hidden rounded-3xl shadow-md">
+          <Image
+            src="/images/cadastro-meditacao.jpg"
+            alt="Pessoa meditando ao pôr do sol"
+            fill
+            preload
+            sizes="(max-width: 768px) 100vw, 672px"
+            className="object-cover object-[center_35%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/30" />
+          <div className="relative flex h-full flex-col justify-center p-8 text-primary-foreground">
+            <Brain className="h-8 w-8 mb-3 opacity-90" />
+            <h1 className="text-3xl font-bold mb-1">Criar sua conta</h1>
+            <p className="text-primary-foreground/85">
+              Escolha o tipo de acesso que melhor representa você.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Criar sua conta</h1>
-          <p className="text-muted-foreground text-lg">
-            Escolha o tipo de acesso que melhor representa você.
-          </p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-5">
@@ -26,8 +36,8 @@ export default function CadastroPage() {
           <Card className="group border-2 hover:border-primary transition-colors cursor-pointer">
             <Link href="/cadastro/paciente" className="block h-full">
               <CardHeader className="pb-3">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
-                  <User className="h-6 w-6 text-blue-600 group-hover:text-primary transition-colors" />
+                <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+                  <User className="h-6 w-6 text-primary group-hover:text-primary transition-colors" />
                 </div>
                 <CardTitle className="text-xl">Sou Paciente</CardTitle>
               </CardHeader>
@@ -58,8 +68,8 @@ export default function CadastroPage() {
           <Card className="group border-2 hover:border-primary transition-colors cursor-pointer">
             <Link href="/cadastro/profissional" className="block h-full">
               <CardHeader className="pb-3">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
-                  <Stethoscope className="h-6 w-6 text-purple-600 group-hover:text-primary transition-colors" />
+                <div className="h-12 w-12 rounded-full bg-accent flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
+                  <Stethoscope className="h-6 w-6 text-accent-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <CardTitle className="text-xl">Sou Profissional</CardTitle>
               </CardHeader>

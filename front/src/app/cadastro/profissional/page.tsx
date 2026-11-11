@@ -125,8 +125,8 @@ export default function CadastroProfissionalPage() {
 
       <Card>
         <CardHeader>
-          <div className="h-11 w-11 rounded-full bg-purple-100 flex items-center justify-center mb-3">
-            <Stethoscope className="h-5 w-5 text-purple-600" />
+          <div className="h-11 w-11 rounded-full bg-violet-100 flex items-center justify-center mb-3">
+            <Stethoscope className="h-5 w-5 text-violet-600" />
           </div>
           <CardTitle className="text-2xl">Cadastro de Profissional</CardTitle>
           <CardDescription>

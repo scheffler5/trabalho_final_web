@@ -18,8 +18,8 @@ const publicLinks = [
 
 function roleConfig(role: string) {
   if (role === "admin")  return { href: "/admin",    label: "Painel Admin",  icon: ShieldCheck, badge: "Admin",  color: "bg-orange-100 text-orange-700" };
-  if (role === "doctor") return { href: "/medico",   label: "Meu Painel",    icon: Stethoscope, badge: "Médico", color: "bg-purple-100 text-purple-700" };
-  return                        { href: "/dashboard", label: "Minha Área",   icon: User,        badge: "Paciente", color: "bg-blue-100 text-blue-700" };
+  if (role === "doctor") return { href: "/medico",   label: "Meu Painel",    icon: Stethoscope, badge: "Médico", color: "bg-violet-100 text-violet-700" };
+  return                        { href: "/dashboard", label: "Minha Área",   icon: User,        badge: "Paciente", color: "bg-teal-100 text-teal-700" };
 }
 
 export default function Navbar() {
@@ -30,9 +30,9 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="mx-auto grid h-16 max-w-[74rem] grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-primary">
+        <Link href="/" className="flex w-fit items-center gap-2 font-bold text-primary">
           <Brain className="h-6 w-6" />
           <span className="text-lg">MenteSã</span>
         </Link>
@@ -51,7 +51,7 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop auth */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center justify-end gap-3">
           {user && rc ? (
             <>
               <Badge variant="outline" className={cn("text-xs", rc.color)}>
@@ -79,7 +79,7 @@ export default function Navbar() {
 
         {/* Mobile */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent">
+          <SheetTrigger className="md:hidden justify-self-end inline-flex items-center justify-center h-9 w-9 rounded-md hover:bg-accent">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </SheetTrigger>
           <SheetContent side="right" className="w-64">

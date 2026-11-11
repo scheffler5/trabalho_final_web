@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,12 +49,12 @@ function LoginForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-0 shadow-none ring-0 bg-transparent">
+      <CardHeader className="px-0">
         <CardTitle className="text-xl">Entrar na sua conta</CardTitle>
         <CardDescription>Acesse para gerenciar seus agendamentos</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {errorType === "invalid" && (
             <div className="flex items-start gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md">
@@ -133,24 +134,51 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Brain className="h-7 w-7 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">MenteSã</h1>
-          <p className="text-sm text-muted-foreground">Área de Acesso</p>
+    <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
+      {/* Lado da foto (some em telas pequenas) */}
+      <div className="relative hidden lg:block">
+        <Image
+          src="/images/login-floresta.jpg"
+          alt="Trilha em uma floresta tranquila"
+          fill
+          preload
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-primary/10" />
+        <div className="absolute inset-x-0 bottom-0 p-12 text-primary-foreground">
+          <Brain className="h-10 w-10 mb-4 opacity-90" />
+          <blockquote className="text-3xl font-semibold leading-snug max-w-md">
+            “Cuidar da mente é o primeiro passo para cuidar de tudo.”
+          </blockquote>
+          <p className="mt-3 text-primary-foreground/80">
+            Atendimento humanizado e sigiloso, no seu tempo.
+          </p>
         </div>
-        <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded-lg" />}>
-          <LoginForm />
-        </Suspense>
-        <p className="text-center text-sm text-muted-foreground">
-          Precisa de ajuda?{" "}
-          <Link href="/sobre" className="text-primary hover:underline">
-            Fale conosco
-          </Link>
-        </p>
+      </div>
+
+      {/* Lado do formulário */}
+      <div className="flex items-center justify-center px-6 py-12 bg-background">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Brain className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold leading-tight">MenteSã</h1>
+              <p className="text-xs text-muted-foreground">Área de Acesso</p>
+            </div>
+          </div>
+          <Suspense fallback={<div className="h-64 animate-pulse bg-muted rounded-lg" />}>
+            <LoginForm />
+          </Suspense>
+          <p className="text-center text-sm text-muted-foreground">
+            Precisa de ajuda?{" "}
+            <Link href="/sobre" className="text-primary hover:underline">
+              Fale conosco
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -38,8 +38,8 @@ export default function MedicoDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-            <Stethoscope className="h-6 w-6 text-purple-600" />
+          <div className="h-12 w-12 rounded-full bg-violet-100 flex items-center justify-center">
+            <Stethoscope className="h-6 w-6 text-violet-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Painel do Médico</h1>
@@ -56,9 +56,9 @@ export default function MedicoDashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Próximas",   value: upcoming.length,  icon: Clock,        color: "text-blue-500"   },
+          { label: "Próximas",   value: upcoming.length,  icon: Clock,        color: "text-teal-500"   },
           { label: "Realizadas", value: completed.length, icon: CheckCircle2, color: "text-green-500"  },
-          { label: "Pacientes",  value: uniquePatients,   icon: Users,        color: "text-purple-500" },
+          { label: "Pacientes",  value: uniquePatients,   icon: Users,        color: "text-violet-500" },
           { label: "Total",      value: appointments.length, icon: Award,     color: "text-yellow-500" },
         ].map(s => (
           <Card key={s.label}>
@@ -93,7 +93,7 @@ export default function MedicoDashboardPage() {
                   <p className="text-xs text-muted-foreground mt-1">Obs: {next.notes}</p>
                 )}
               </div>
-              <Badge className="bg-blue-100 text-blue-700 border-0">Agendada</Badge>
+              <Badge className="bg-teal-100 text-teal-700 border-0">Agendada</Badge>
             </div>
           </CardContent>
         </Card>
@@ -113,8 +113,8 @@ export default function MedicoDashboardPage() {
                 {upcoming.map(a => (
                   <Card key={a.id}>
                     <CardContent className="p-4 flex items-center gap-3 flex-wrap">
-                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                        <Clock className="h-4 w-4 text-blue-500" />
+                      <div className="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
+                        <Clock className="h-4 w-4 text-teal-500" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{a.patientName}</p>
@@ -123,7 +123,7 @@ export default function MedicoDashboardPage() {
                         </p>
                         {a.notes && <p className="text-xs text-muted-foreground truncate">Obs: {a.notes}</p>}
                       </div>
-                      <Badge className="bg-blue-100 text-blue-700 border-0 shrink-0">Agendada</Badge>
+                      <Badge className="bg-teal-100 text-teal-700 border-0 shrink-0">Agendada</Badge>
                     </CardContent>
                   </Card>
                 ))}
@@ -166,8 +166,8 @@ export default function MedicoDashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <Stethoscope className="h-5 w-5 text-purple-600" />
+              <div className="h-12 w-12 rounded-full bg-violet-100 flex items-center justify-center">
+                <Stethoscope className="h-5 w-5 text-violet-600" />
               </div>
               <div>
                 <p className="font-semibold text-sm">{doc?.name}</p>

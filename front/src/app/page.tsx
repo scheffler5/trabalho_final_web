@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,31 +50,55 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-background to-background py-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <Badge className="mb-4" variant="secondary">
-            Clínica Psiquiátrica de Referência
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-foreground">
-            Cuidando da sua{" "}
-            <span className="text-primary">saúde mental</span>{" "}
-            com excelência
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Agende sua consulta com especialistas renomados em psiquiatria. Um
-            atendimento humanizado e confidencial para o seu bem-estar.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login">
-              <Button size="lg" className="gap-2">
-                Agendar Consulta <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/medicos">
-              <Button size="lg" variant="outline">
-                Conhecer Médicos
-              </Button>
-            </Link>
+      <section className="relative overflow-hidden bg-gradient-to-br from-secondary via-background to-accent/60 py-16 md:py-24 px-4">
+        <div className="container mx-auto max-w-6xl grid items-center gap-12 lg:grid-cols-2">
+          <div className="text-center lg:text-left">
+            <Badge className="mb-4" variant="secondary">
+              Clínica Psiquiátrica de Referência
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-foreground">
+              Cuidando da sua{" "}
+              <span className="text-primary">saúde mental</span>{" "}
+              com excelência
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+              Agende sua consulta com especialistas renomados em psiquiatria. Um
+              atendimento humanizado e confidencial para o seu bem-estar.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Link href="/login">
+                <Button size="lg" className="gap-2">
+                  Agendar Consulta <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/medicos">
+                <Button size="lg" variant="outline">
+                  Conhecer Médicos
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-lg">
+            <div className="absolute -inset-4 rounded-[2rem] bg-primary/15 rotate-3" />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-xl">
+              <Image
+                src="/images/home-amanhecer.jpg"
+                alt="Amanhecer sereno sobre um campo verde"
+                fill
+                preload
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="absolute -bottom-5 -left-5 flex items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
+                <Heart className="h-5 w-5 text-accent-foreground" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold">Acolhimento</p>
+                <p className="text-xs text-muted-foreground">em cada consulta</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

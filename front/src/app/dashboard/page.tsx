@@ -20,14 +20,14 @@ import { ptBR } from "date-fns/locale";
 
 function statusBadge(status: string) {
   if (status === "scheduled")
-    return <Badge className="bg-blue-100 text-blue-700 border-0">Agendada</Badge>;
+    return <Badge className="bg-teal-100 text-teal-700 border-0">Agendada</Badge>;
   if (status === "completed")
     return <Badge className="bg-green-100 text-green-700 border-0">Concluída</Badge>;
   return <Badge className="bg-red-100 text-red-700 border-0">Cancelada</Badge>;
 }
 
 function statusIcon(status: string) {
-  if (status === "scheduled") return <Clock className="h-4 w-4 text-blue-500" />;
+  if (status === "scheduled") return <Clock className="h-4 w-4 text-teal-500" />;
   if (status === "completed") return <CheckCircle2 className="h-4 w-4 text-green-500" />;
   return <XCircle className="h-4 w-4 text-red-500" />;
 }
@@ -65,7 +65,7 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Próximas",   value: upcoming.length,                                      icon: CalendarDays,  color: "text-blue-500"   },
+          { label: "Próximas",   value: upcoming.length,                                      icon: CalendarDays,  color: "text-teal-500"   },
           { label: "Realizadas", value: past.filter(a => a.status === "completed").length,    icon: CheckCircle2,  color: "text-green-500"  },
           { label: "Total",      value: appointments.length,                                  icon: Brain,         color: "text-primary"    },
           { label: "Médicos",    value: new Set(appointments.map(a => a.doctorId)).size,      icon: User,          color: "text-orange-500" },

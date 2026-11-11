@@ -21,8 +21,8 @@ import { ptBR } from "date-fns/locale";
 
 function roleBadge(role: string) {
   if (role === "admin")   return <Badge className="bg-orange-100 text-orange-700 border-0">Admin</Badge>;
-  if (role === "doctor")  return <Badge className="bg-purple-100 text-purple-700 border-0">Médico</Badge>;
-  return                         <Badge className="bg-blue-100 text-blue-700 border-0">Paciente</Badge>;
+  if (role === "doctor")  return <Badge className="bg-violet-100 text-violet-700 border-0">Médico</Badge>;
+  return                         <Badge className="bg-teal-100 text-teal-700 border-0">Paciente</Badge>;
 }
 
 function statusBadge(status: string) {
@@ -68,8 +68,8 @@ export default function AdminPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Pacientes",  value: patients.length,  icon: UserIcon,    color: "text-blue-500" },
-          { label: "Médicos",    value: doctors.length,   icon: Stethoscope, color: "text-purple-500" },
+          { label: "Pacientes",  value: patients.length,  icon: UserIcon,    color: "text-teal-500" },
+          { label: "Médicos",    value: doctors.length,   icon: Stethoscope, color: "text-violet-500" },
           { label: "Pendentes",  value: pending.length,   icon: Clock,       color: "text-yellow-500" },
           { label: "Admins",     value: admins.length,    icon: ShieldCheck, color: "text-orange-500" },
         ].map(s => (
@@ -205,8 +205,8 @@ function QueueCard({ user, onApprove, onReject }: {
     <div className="border rounded-lg p-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-            <Stethoscope className="h-5 w-5 text-purple-600" />
+          <div className="h-10 w-10 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+            <Stethoscope className="h-5 w-5 text-violet-600" />
           </div>
           <div>
             <p className="font-semibold">{user.name}</p>
