@@ -11,8 +11,8 @@ import { Label } from "@/components/ui/label";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
-import { type AdminUser, ADMIN_REGISTER_CODE } from "@/lib/auth";
+import { api } from "@/lib/api";
+import { ADMIN_REGISTER_CODE } from "@/lib/auth";
 import {
   Eye, EyeOff, CheckCircle2, ArrowLeft, ShieldCheck, Lock,
 } from "lucide-react";
@@ -34,7 +34,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function AdminRegistroPage() {
-  const { register: registerUser } = useAuth();
   const [showPwd, setShowPwd]     = useState(false);
   const [showConf, setShowConf]   = useState(false);
   const [showCode, setShowCode]   = useState(false);
@@ -48,18 +47,20 @@ export default function AdminRegistroPage() {
 
   async function onSubmit(data: FormData) {
     setServerError("");
-    const newAdmin: AdminUser = {
-      id:        `a_${Date.now()}`,
-      name:      data.name,
-      email:     data.email,
-      password:  data.password,
-      role:      "admin",
-      status:    "approved",
-      createdAt: new Date().toISOString(),
-    };
-    const result = registerUser(newAdmin);
-    if (!result.ok) { setServerError(result.message); return; }
-    setSuccess(true);
+    try {
+      await api("/auth/register/admin", {
+        method: "POST",
+        body: JSON.stringify({
+          name:         data.name,
+          email:        data.email,
+          password:     data.password,
+          registerCode: data.accessCode,
+        }),
+      });
+      setSuccess(true);
+    } catch (err: any) {
+      setServerError(err.message || "Erro ao criar conta");
+    }
   }
 
   if (success) {

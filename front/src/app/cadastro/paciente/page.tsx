@@ -11,8 +11,7 @@ import { Label } from "@/components/ui/label";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
-import type { PatientUser } from "@/lib/auth";
+import { api } from "@/lib/api";
 import { Eye, EyeOff, CheckCircle2, ArrowLeft, User } from "lucide-react";
 
 // ─── Máscaras ─────────────────────────────────────────────────────────────────
@@ -54,7 +53,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function CadastroPacientePage() {
-  const { register: registerUser } = useAuth();
   const [showPwd, setShowPwd]     = useState(false);
   const [showConf, setShowConf]   = useState(false);
   const [success, setSuccess]     = useState(false);
@@ -70,21 +68,22 @@ export default function CadastroPacientePage() {
 
   async function onSubmit(data: FormData) {
     setServerError("");
-    const newUser: PatientUser = {
-      id:          `p_${Date.now()}`,
-      name:        data.name,
-      email:       data.email,
-      password:    data.password,
-      role:        "patient",
-      status:      "approved",
-      createdAt:   new Date().toISOString(),
-      cpf:         data.cpf,
-      dateOfBirth: data.dateOfBirth,
-      phone:       data.phone || undefined,
-    };
-    const result = registerUser(newUser);
-    if (!result.ok) { setServerError(result.message); return; }
-    setSuccess(true);
+    try {
+      await api("/auth/register/patient", {
+        method: "POST",
+        body: JSON.stringify({
+          name:        data.name,
+          email:       data.email,
+          password:    data.password,
+          cpf:         data.cpf,
+          dateOfBirth: data.dateOfBirth,
+          phone:       data.phone || undefined,
+        }),
+      });
+      setSuccess(true);
+    } catch (err: any) {
+      setServerError(err.message || "Erro ao cadastrar");
+    }
   }
 
   if (success) {
