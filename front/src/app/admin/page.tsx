@@ -8,10 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  type User, type DoctorUser,
-  getAllUsers, updateUserStatus,
-} from "@/lib/auth";
+import { api } from "@/lib/api";
+import { type User, type DoctorUser } from "@/lib/auth";
 import {
   Users, UserCheck, Clock, XCircle, CheckCircle2,
   Stethoscope, User as UserIcon, ShieldCheck, LogOut,
@@ -35,12 +33,18 @@ export default function AdminPage() {
   const { user, logout } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
 
-  function reload() { setUsers(getAllUsers()); }
+  async function reload() {
+    try { setUsers(await api<User[]>("/users")); } catch {}
+  }
 
   useEffect(() => { reload(); }, []);
 
-  function approve(id: string) { updateUserStatus(id, "approved"); reload(); }
-  function reject(id: string)  { updateUserStatus(id, "rejected"); reload(); }
+  async function approve(id: string) {
+    try { await api(`/users/${id}/status`, { method: "PATCH", body: JSON.stringify({ status: "approved" }) }); reload(); } catch {}
+  }
+  async function reject(id: string) {
+    try { await api(`/users/${id}/status`, { method: "PATCH", body: JSON.stringify({ status: "rejected" }) }); reload(); } catch {}
+  }
 
   const pending   = users.filter(u => u.status === "pending");
   const doctors   = users.filter(u => u.role === "doctor");

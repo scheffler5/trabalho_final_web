@@ -4,18 +4,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getAllUsers, type DoctorUser } from "@/lib/auth";
+import { api } from "@/lib/api";
+import { type DoctorUser } from "@/lib/auth";
 import { Brain, Star, ArrowRight, Stethoscope } from "lucide-react";
 
 export default function FeaturedDoctors() {
   const [doctors, setDoctors] = useState<DoctorUser[]>([]);
 
   useEffect(() => {
-    const all = getAllUsers();
-    const approved = all
-      .filter((u): u is DoctorUser => u.role === "doctor" && u.status === "approved")
-      .slice(0, 2);
-    setDoctors(approved);
+    api<DoctorUser[]>("/users/doctors")
+      .then((docs) => setDoctors(docs.slice(0, 2)))
+      .catch(() => {});
   }, []);
 
   if (doctors.length === 0) {

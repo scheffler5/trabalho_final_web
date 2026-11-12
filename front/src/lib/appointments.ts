@@ -1,45 +1,68 @@
+import { api } from "./api";
+
 export interface Appointment {
   id: string;
   patientId: string;
-  patientName: string;
+  patient?: { id: string; name: string };
   doctorId: string;
-  doctorName: string;
+  doctor?: { id: string; name: string; specialty?: string; profession?: string };
   specialty: string;
-  date: string;   // "YYYY-MM-DD"
-  time: string;   // "HH:MM"
+  date: string;
+  time: string;
   status: "scheduled" | "completed" | "cancelled";
   notes?: string;
   createdAt: string;
 }
 
-const KEY = "clinica_appointments";
-
-export function getAllAppointments(): Appointment[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Appointment[]) : [];
-  } catch { return []; }
+export interface CreateAppointmentPayload {
+  doctorId: string;
+  specialty: string;
+  date: string;
+  time: string;
+  notes?: string;
 }
 
-function save(appointments: Appointment[]): void {
-  try { localStorage.setItem(KEY, JSON.stringify(appointments)); } catch {}
+export interface TimeSlot {
+  time: string;
+  available: boolean;
 }
 
-export function addAppointment(appt: Appointment): void {
-  const all = getAllAppointments();
-  all.push(appt);
-  save(all);
+// Monta a query string só com os filtros preenchidos
+function toQuery(params: Record<string, string | undefined>) {
+  const qs = new URLSearchParams(
+    Object.entries(params).filter((e): e is [string, string] => !!e[1]),
+  ).toString();
+  return qs ? `?${qs}` : "";
 }
 
-export function getPatientAppointments(patientId: string): Appointment[] {
-  return getAllAppointments().filter((a) => a.patientId === patientId);
-}
+export const getPatientAppointments = (status?: Appointment["status"]) =>
+  api<Appointment[]>(`/appointments/me${toQuery({ status })}`);
 
-export function getDoctorAppointments(doctorId: string): Appointment[] {
-  return getAllAppointments().filter((a) => a.doctorId === doctorId);
-}
+// GET /appointments/slots?doctorId=...&date=YYYY-MM-DD
+export const getSlots = (doctorId: string, date: string) =>
+  api<TimeSlot[]>(`/appointments/slots${toQuery({ doctorId, date })}`);
 
-export function isUpcoming(appt: Appointment): boolean {
-  return appt.status === "scheduled" && appt.date >= new Date().toISOString().slice(0, 10);
+export const getDoctorAppointments = () =>
+  api<Appointment[]>("/appointments/doctor");
+
+export const getAllAppointments = () =>
+  api<Appointment[]>("/appointments");
+
+export const addAppointment = (payload: CreateAppointmentPayload) =>
+  api<Appointment>("/appointments", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const updateAppointmentStatus = (
+  id: string,
+  status: Appointment["status"],
+) =>
+  api<Appointment>(`/appointments/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+
+export function isUpcoming(a: Appointment) {
+  return a.status === "scheduled" && a.date >= new Date().toISOString().slice(0, 10);
 }
