@@ -25,7 +25,7 @@ export default function MedicoDashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   useEffect(() => {
-    if (user) setAppointments(getDoctorAppointments(user.id));
+    if (user) getDoctorAppointments().then(setAppointments).catch(() => {});
   }, [user]);
 
   const upcoming  = appointments.filter(isUpcoming);
@@ -84,7 +84,7 @@ export default function MedicoDashboardPage() {
           <CardContent>
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <p className="font-semibold">{next.patientName}</p>
+                <p className="font-semibold">{next.patient?.name}</p>
                 <p className="text-sm text-muted-foreground">{next.specialty}</p>
                 <p className="text-sm font-medium">
                   {format(new Date(next.date + "T12:00:00"), "dd 'de' MMMM", { locale: ptBR })} às {next.time}
@@ -117,7 +117,7 @@ export default function MedicoDashboardPage() {
                         <Clock className="h-4 w-4 text-blue-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{a.patientName}</p>
+                        <p className="font-semibold text-sm truncate">{a.patient?.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {format(new Date(a.date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} às {a.time}
                         </p>
@@ -142,7 +142,7 @@ export default function MedicoDashboardPage() {
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{a.patientName}</p>
+                        <p className="font-semibold text-sm truncate">{a.patient?.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {format(new Date(a.date + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR })} às {a.time}
                         </p>

@@ -1,9 +1,10 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, UseGuards,
+  Param, Body, Query, UseGuards,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { ListAppointmentsQueryDto, SlotsQueryDto } from './dto/query-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -19,24 +20,31 @@ export class AppointmentsController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles('admin')
-  findAll() {
-    return this.svc.findAll();
+  findAll(@Query() q: ListAppointmentsQueryDto) {
+    return this.svc.findAll(q);
   }
 
   // Paciente — suas consultas
   @Get('me')
   @UseGuards(RolesGuard)
   @Roles('patient')
-  myAppointments(@CurrentUser() user: any) {
-    return this.svc.findByPatient(user.id);
+  myAppointments(@CurrentUser() user: any, @Query() q: ListAppointmentsQueryDto) {
+    return this.svc.findByPatient(user.id, q);
   }
 
   // Médico — suas consultas
   @Get('doctor')
   @UseGuards(RolesGuard)
   @Roles('doctor')
-  doctorAppointments(@CurrentUser() user: any) {
-    return this.svc.findByDoctor(user.id);
+  doctorAppointments(@CurrentUser() user: any, @Query() q: ListAppointmentsQueryDto) {
+    return this.svc.findByDoctor(user.id, q);
+  }
+
+  // Autenticado — horários livres de um médico num dia
+  // GET /appointments/slots?doctorId=<uuid>&date=YYYY-MM-DD
+  @Get('slots')
+  slots(@Query() q: SlotsQueryDto) {
+    return this.svc.getSlots(q.doctorId, q.date);
   }
 
   // Paciente — criar consulta

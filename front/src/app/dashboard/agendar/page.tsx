@@ -18,15 +18,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { type DoctorUser } from "@/lib/auth";
-import { addAppointment } from "@/lib/appointments";
-import { TIME_SLOTS } from "@/lib/data";
+import { addAppointment, getSlots, type TimeSlot } from "@/lib/appointments";
 import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
-import { ArrowLeft, CheckCircle2, CalendarDays, Clock, Brain } from "lucide-react";
+import { ArrowLeft, CheckCircle2, CalendarDays, Clock, Brain, AlertCircle } from "lucide-react";
 
 const scheduleSchema = z.object({
   doctorId: z.string().min(1, "Selecione um médico"),
-  date:     z.date({ required_error: "Selecione uma data" }),
+  date:     z.date({ error: "Selecione uma data" }),
   time:     z.string().min(1, "Selecione um horário"),
   notes:    z.string().max(300, "Máximo de 300 caracteres").optional(),
 });
@@ -38,6 +37,9 @@ export default function AgendarPage() {
   const [doctors, setDoctors]               = useState<DoctorUser[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorUser | null>(null);
   const [success, setSuccess]               = useState(false);
+  const [slots, setSlots]                   = useState<TimeSlot[]>([]);
+  const [slotsLoading, setSlotsLoading]     = useState(false);
+  const [submitError, setSubmitError]       = useState<string | null>(null);
 
   useEffect(() => {
     api<DoctorUser[]>("/users/doctors").then(setDoctors).catch(() => {});
@@ -48,9 +50,25 @@ export default function AgendarPage() {
     formState: { errors, isSubmitting },
   } = useForm<ScheduleFormData>({ resolver: zodResolver(scheduleSchema) });
 
-  const watchedDate = watch("date");
+  const watchedDate     = watch("date");
+  const watchedDoctorId = watch("doctorId");
+  const dateKey = watchedDate ? format(watchedDate, "yyyy-MM-dd") : null;
 
-  function onDoctorChange(id: string) {
+  // Busca na API os horários livres sempre que médico ou data mudam
+  useEffect(() => {
+    if (!watchedDoctorId || !dateKey) return;
+    let active = true;
+    setSlotsLoading(true);
+    setValue("time", "");
+    getSlots(watchedDoctorId, dateKey)
+      .then((list) => { if (active) setSlots(list); })
+      .catch(() => { if (active) setSlots([]); })
+      .finally(() => { if (active) setSlotsLoading(false); });
+    return () => { active = false; };
+  }, [watchedDoctorId, dateKey, setValue]);
+
+  function onDoctorChange(id: string | null) {
+    if (!id) return;
     const doc = doctors.find((d) => d.id === id) ?? null;
     setSelectedDoctor(doc);
     setValue("doctorId", id);
@@ -58,6 +76,7 @@ export default function AgendarPage() {
 
   async function onSubmit(data: ScheduleFormData) {
     if (!user) return;
+    setSubmitError(null);
     try {
       await addAppointment({
         doctorId:  data.doctorId,
@@ -67,7 +86,11 @@ export default function AgendarPage() {
         notes:     data.notes || undefined,
       });
       setSuccess(true);
-    } catch {}
+    } catch (e) {
+      // Ex.: 409 "Este horário já está ocupado" (outra pessoa agendou antes)
+      setSubmitError(e instanceof Error ? e.message : "Não foi possível agendar");
+      if (watchedDoctorId && dateKey) getSlots(watchedDoctorId, dateKey).then(setSlots).catch(() => {});
+    }
   }
 
   if (success) {
@@ -193,18 +216,38 @@ export default function AgendarPage() {
             <Controller control={control} name="time"
               render={({ field }) => (
                 <div className="space-y-1.5">
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                    {TIME_SLOTS.map((t) => (
-                      <button key={t} type="button" onClick={() => field.onChange(t)}
-                        className={`px-2 py-2 text-sm rounded-md border transition-colors ${
-                          field.value === t
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "hover:border-primary hover:text-primary"
-                        }`}>
-                        {t}
-                      </button>
-                    ))}
-                  </div>
+                  {!watchedDoctorId || !watchedDate ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      Escolha o médico e a data para ver os horários livres.
+                    </p>
+                  ) : slotsLoading ? (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="h-9 rounded-md bg-muted animate-pulse" />
+                      ))}
+                    </div>
+                  ) : slots.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-2">
+                      Não foi possível carregar os horários.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {slots.map(({ time: t, available }) => (
+                        <button key={t} type="button" disabled={!available}
+                          onClick={() => field.onChange(t)}
+                          title={available ? undefined : "Horário ocupado"}
+                          className={`px-2 py-2 text-sm rounded-md border transition-colors ${
+                            !available
+                              ? "opacity-40 line-through cursor-not-allowed"
+                              : field.value === t
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "hover:border-primary hover:text-primary"
+                          }`}>
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {errors.time && (
                     <p className="text-xs text-destructive">{errors.time.message}</p>
                   )}
@@ -234,6 +277,13 @@ export default function AgendarPage() {
             </div>
           </CardContent>
         </Card>
+
+        {submitError && (
+          <div className="flex items-start gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            {submitError}
+          </div>
+        )}
 
         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
           {isSubmitting ? "Confirmando..." : "Confirmar Agendamento"}
